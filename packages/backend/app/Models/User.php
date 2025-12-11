@@ -32,7 +32,6 @@ class User extends Model
                 $table->string("avatar")->nullable();
                 $table->string("telegram_id")->nullable();
                 $table->boolean("is_premium")->default(false);
-                $table->string("google_calendar_token")->nullable();
             });
         }
     }

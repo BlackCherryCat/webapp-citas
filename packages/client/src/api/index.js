@@ -170,4 +170,13 @@ export default class API {
 
 		return response.data
 	}
+
+	static async syncGoogleCalendar() {
+		const response = await this.baseRequest({
+			method: "GET",
+			url: "/calendar/google-auth",
+		})
+
+		return response.data
+	}
 }

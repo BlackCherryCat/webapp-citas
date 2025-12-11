@@ -109,3 +109,26 @@ main {
 		background-position: 0% 0%;
 	}
 }
+
+.fc .fc-daygrid-day-number {
+	color: var(--color-text-mute);
+}
+
+.fc .fc-daygrid-event {
+	border: 1px solid var(--color-primary);
+}
+
+.fc .fc-daygrid-event:hover {
+	background-color: var(--color-primary-light);
+	cursor: pointer;
+}
+
+.fc .fc-daygrid-day:hover {
+	background-color: var(--vt-c-text-light-2);
+	cursor: pointer;
+}
+
+a {
+	color: var(--color-primary);
+	text-decoration: none;
+}

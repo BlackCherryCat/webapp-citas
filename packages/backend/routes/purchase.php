@@ -42,7 +42,7 @@ $group->post('/create-checkout-session', function ($request, $response) {
     $response->getBody()->write(json_encode([
         'url' => $session->url,
     ]));
-    return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+    return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
 })->add(new JWTAuth());
 
 // Ruta para confirmar la compra

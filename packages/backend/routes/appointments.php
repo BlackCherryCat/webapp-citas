@@ -4,6 +4,7 @@ use App\Models\Appointment;
 use App\Middlewares\JWTAuth;
 use App\Models\User;
 use Slim\Routing\RouteCollectorProxy;
+use App\Helpers\Telegram;
 
 
 return function (App $app) {
@@ -36,15 +37,15 @@ $group->post('', function ($request, $response) {
 
     // Enviar mensaje de Telegram si el usuario tiene un telegram_id
             if (!empty($user['telegram_id'])) {
-                sendTelegramMessage($user['telegram_id'], "¡Tienes una nueva cita! 📅\n\nTítulo: {$body['title']}\nDescripción: {$body['description']}\nFecha: {$body['date']}");
+                Telegram::sendMessage($user['telegram_id'], "¡Tienes una nueva cita! 📅\n\nTítulo: {$body['title']}\nDescripción: {$body['description']}\nFecha: {$body['date']}");
             }
             if (!empty($body['guest_user_telegram_id'])) {
-                sendTelegramMessage($body['guest_user_telegram_id'], "¡Tienes una nueva cita con {$user['name']}! 📅\n\nTítulo: {$body['title']}\nDescripción: {$body['description']}\nFecha: {$body['date']}");
+                Telegram::sendMessage($body['guest_user_telegram_id'], "¡Tienes una nueva cita con {$user['name']}! 📅\n\nTítulo: {$body['title']}\nDescripción: {$body['description']}\nFecha: {$body['date']}");
             } else {
                 // Invitado con cuenta
                     $guest = User::find($appointment->guest_user_id);
                     if ($guest && !empty($guest->telegram_id)) {
-                        sendTelegramMessage(
+                        Telegram::sendMessage(
                             $guest->telegram_id,
                             "¡Tienes una nueva cita con {$user['name']}! 📅\n\nTítulo: {$body['title']}\nDescripción: {$body['description']}\nFecha: {$body['date']}"
                         );
@@ -52,7 +53,7 @@ $group->post('', function ($request, $response) {
             }
 
     $response->getBody()->write(json_encode(['success' => true, 'appointment' => $appointment]));
-    return $response->withHeader('Content-Type', 'application/json');
+    return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
 });
 $group->get('', function ($request, $response) {
     $user = $request->getAttribute('user');
@@ -85,7 +86,7 @@ $group->get('', function ($request, $response) {
                 });
 
     $response->getBody()->write($appointments->toJson());
-    return $response->withHeader('Content-Type', 'application/json');
+    return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
 });
 $group->put('', function ($request, $response) {
     $user = $request->getAttribute('user'); // El host, autenticado
@@ -111,15 +112,15 @@ $group->put('', function ($request, $response) {
 
     // Enviar mensaje de Telegram si el usuario tiene un telegram_id
             if (!empty($user['telegram_id'])) {
-                sendTelegramMessage($user['telegram_id'], "¡Has editado tu cita! 📅\n\nTítulo: {$body['title']}\nDescripción: {$body['description']}\nFecha: {$body['date']}");
+                Telegram::sendMessage($user['telegram_id'], "¡Has editado tu cita! 📅\n\nTítulo: {$body['title']}\nDescripción: {$body['description']}\nFecha: {$body['date']}");
             }
             if (!empty($appointment->guest_user_telegram_id)) {
-                sendTelegramMessage($appointment->guest_user_telegram_id, "¡La cita de {$user['name']} con usted ha sido editada! 📅\n\nTítulo: {$body['title']}\nDescripción: {$body['description']}\nFecha: {$body['date']}");
+                Telegram::sendMessage($appointment->guest_user_telegram_id, "¡La cita de {$user['name']} con usted ha sido editada! 📅\n\nTítulo: {$body['title']}\nDescripción: {$body['description']}\nFecha: {$body['date']}");
             } else {
                 // Invitado con cuenta
                     $guest = User::find($appointment->guest_user_id);
                     if ($guest && !empty($guest->telegram_id)) {
-                        sendTelegramMessage(
+                        Telegram::sendMessage(
                             $guest->telegram_id,
                             "¡La cita de {$user['name']} con usted ha sido editada! 📅\n\nTítulo: {$body['title']}\nDescripción: {$body['description']}\nFecha: {$body['date']}"
                         );
@@ -127,31 +128,30 @@ $group->put('', function ($request, $response) {
             }
 
     $response->getBody()->write(json_encode(['success' => true, 'appointment' => $appointment]));
-    return $response->withHeader('Content-Type', 'application/json');
+    return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
 });
 $group->delete('', function ($request, $response) {
     $user = $request->getAttribute('user');
     $body = $request->getParsedBody();
     echo $body['id'];
 
-    // Verificar que la cita existe y pertenece al usuario
     $appointment = Appointment::find($body['id']);
 
     $appointment->delete();
 
     // Enviar mensaje de Telegram si aplica
     if (!empty($user['telegram_id'])) {
-        sendTelegramMessage($user['telegram_id'], "Has eliminado la cita: {$appointment->title} 📅");
+        Telegram::sendMessage($user['telegram_id'], "Has eliminado la cita: {$appointment->title} 📅");
     }
 
     if (!empty($appointment->guest_user_telegram_id)) {
         // Invitado sin cuenta pero con telegram
-        sendTelegramMessage($appointment->guest_user_telegram_id, "{$user['name']} ha cancelado la cita: {$appointment->title} 📅");
+        Telegram::sendMessage($appointment->guest_user_telegram_id, "{$user['name']} ha cancelado la cita: {$appointment->title} 📅");
     } else {
         // Invitado con cuenta
             $guest = User::find($appointment->guest_user_id);
             if ($guest && !empty($guest->telegram_id)) {
-                sendTelegramMessage(
+                Telegram::sendMessage(
                     $guest->telegram_id,
                     "{$user['name']} ha cancelado la cita: {$appointment->title} 📅"
                 );
@@ -159,27 +159,7 @@ $group->delete('', function ($request, $response) {
     }
 
     $response->getBody()->write(json_encode(['success' => true]));
-    return $response->withHeader('Content-Type', 'application/json');
+    return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
 });
 })->add(new JWTAuth());
 };
-
-// Función para enviar mensajes de Telegram
-function sendTelegramMessage($telegramId, $message) {
-    $botToken = $_ENV['TELEGRAM_BOT_TOKEN']; // Asegúrate de agregar esto en tu archivo .env
-    $apiUrl = "https://api.telegram.org/bot$botToken/sendMessage";
-
-    $params = [
-        'chat_id' => $telegramId,
-        'text' => $message,
-        'parse_mode' => 'Markdown'
-    ];
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $apiUrl);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
-    curl_exec($ch);
-    curl_close($ch);
-}

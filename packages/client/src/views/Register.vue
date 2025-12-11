@@ -1,27 +1,27 @@
 <template>
 	<div class="register-container">
-		<h1>Register</h1>
+		<h1>Registro</h1>
 
 		<form
 			@submit.prevent="register"
 			name="registerForm"
 			class="register-form"
 		>
-			<label for="name">Name:</label>
+			<label for="name">Nombre:</label>
 			<input type="text" id="name" v-model="name" required />
 
 			<label for="email">Email:</label>
 			<input type="email" id="email" v-model="email" required />
 
-			<label for="password">Password:</label>
+			<label for="password">Contraseña:</label>
 			<input type="password" id="password" v-model="password" required />
 
-			<button type="submit">Register</button>
+			<button type="submit">Registrarse</button>
 		</form>
 
 		<p v-if="error">{{ error }}</p>
 
-		<router-link to="/login">Login with a account</router-link>
+		<router-link to="/login">Iniciar sesión</router-link>
 	</div>
 </template>
 
@@ -33,7 +33,7 @@ export default {
 			error: null,
 			name: "Test",
 			email: "test@example.com",
-			password: "123",
+			password: "123"
 		}
 	},
 	methods: {
@@ -45,7 +45,7 @@ export default {
 				.register({
 					name: this.name,
 					email: this.email,
-					password: this.password,
+					password: this.password
 				})
 				.catch((error) => {
 					console.error(error)
@@ -59,12 +59,17 @@ export default {
 			if (result) {
 				this.$router.push("/login")
 			}
-		},
-	},
+		}
+	}
 }
 </script>
 
 <style scoped>
+a {
+	color: #007bff;
+	text-decoration: underline;
+}
+
 .register-container {
 	display: flex;
 	flex-direction: column;

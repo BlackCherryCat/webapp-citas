@@ -2,7 +2,7 @@
 	<dialog :open="isOpen">
 		<article>
 			<h2>Agrega tu cita</h2>
-			<form @submit="submitAppointment">
+			<form @submit.prevent="submitAppointment">
 				<p><strong>Fecha:</strong> {{ date }}</p>
 
 				<label>
@@ -14,6 +14,7 @@
 					Descripción
 					<textarea v-model="form.description" required></textarea>
 				</label>
+				<br />
 
 				<label>
 					Hora de la cita
@@ -99,6 +100,7 @@ export default {
 					this.error = error.response.data.error
 					return null
 				})
+			window.location.reload()
 		},
 	},
 }

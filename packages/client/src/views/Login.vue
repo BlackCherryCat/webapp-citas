@@ -1,20 +1,20 @@
 <template>
 	<div class="login-container">
-		<h1>Login</h1>
+		<h1>Iniciar sesión</h1>
 
 		<form name="loginForm" @submit.prevent="login" class="login-form">
 			<label for="email">Email:</label>
 			<input type="email" id="email" v-model="email" required />
 
-			<label for="password">Password:</label>
+			<label for="password">Contraseña:</label>
 			<input type="password" id="password" v-model="password" required />
 
-			<button type="submit" :disabled="loading">Login</button>
+			<button type="submit" :disabled="loading">Iniciar sesión</button>
 		</form>
 
 		<div v-if="error" class="error-message">{{ error }}</div>
 
-		<router-link to="/register">Register a new account</router-link>
+		<router-link to="/register">Registrarse</router-link>
 	</div>
 </template>
 
@@ -26,7 +26,7 @@ export default {
 			loading: false,
 			error: null,
 			email: "test@example.com",
-			password: "123",
+			password: "123"
 		}
 	},
 	methods: {
@@ -37,7 +37,7 @@ export default {
 			await this.$session.login(
 				{
 					email: this.email,
-					password: this.password,
+					password: this.password
 				},
 				{
 					onSuccess: () => {
@@ -45,17 +45,22 @@ export default {
 					},
 					onError: (error) => {
 						this.error = error.response.data.error
-					},
-				},
+					}
+				}
 			)
 
 			this.loading = false
-		},
-	},
+		}
+	}
 }
 </script>
 
 <style scoped>
+a {
+	color: #007bff;
+	text-decoration: underline;
+}
+
 .login-container {
 	display: flex;
 	flex-direction: column;

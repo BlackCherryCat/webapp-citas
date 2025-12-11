@@ -2,7 +2,7 @@
 	<dialog :open="isOpen">
 		<article>
 			<h2>Edita esta cita</h2>
-			<form @submit="editAppointment">
+			<form @submit.prevent="editAppointment">
 				<label>
 					Título
 					<input type="text" v-model="form.title" required />
@@ -12,6 +12,7 @@
 					Descripción
 					<textarea v-model="form.description" required></textarea>
 				</label>
+				<br />
 
 				<label>
 					Dia de la cita
@@ -98,6 +99,7 @@ export default {
 					this.error = error.response.data.error
 					return null
 				})
+			window.location.reload()
 		},
 		getToday() {
 			const today = new Date()
@@ -145,5 +147,6 @@ export default {
 
 .form-buttons button {
 	width: 25%;
+	margin-bottom: 0;
 }
 </style>

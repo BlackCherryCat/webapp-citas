@@ -12,19 +12,19 @@ export default defineConfig({
 			"/api": {
 				target: "http://localhost:5000",
 				changeOrigin: true,
-				rewrite: (path) => path.replace(/^\/api/, ""),
-			},
-		},
+				rewrite: (path) => path.replace(/^\/api/, "")
+			}
+		}
 	},
 	plugins: [
 		vue(),
 		vueDevTools({
-			launchEditor: "zeditor",
-		}),
+			launchEditor: "zeditor"
+		})
 	],
 	resolve: {
 		alias: {
-			"@": fileURLToPath(new URL("./src", import.meta.url)),
-		},
-	},
+			"@": fileURLToPath(new URL("./src", import.meta.url))
+		}
+	}
 })

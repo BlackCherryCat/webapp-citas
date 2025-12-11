@@ -1,25 +1,23 @@
 <template>
-	<div>
-		<h1>Calendario</h1>
-
-		<!-- FullCalendar -->
-		<FullCalendar
-			ref="calendar"
-			:options="calendarOptions"
-			@date-click="handleDateClick"
-			@event-click="handleEventClick"
-		/>
-		<ModalEvento
-			:isOpen="showEventModal"
-			:date="modalDate"
-			@close="handleModalClose"
-		></ModalEvento>
-		<ModalEventoEdit
-			:isOpen="showEditModal"
-			@close="handleModalClose"
-			:appointmentData="modalAppointment"
-		></ModalEventoEdit>
-	</div>
+	<h1>Calendario</h1>
+	<button @click="syncWithGoogle">🔄 Sincronizar con Google Calendar</button>
+	<!-- FullCalendar -->
+	<FullCalendar
+		ref="calendar"
+		:options="calendarOptions"
+		@date-click="handleDateClick"
+		@event-click="handleEventClick"
+	/>
+	<ModalEvento
+		:isOpen="showEventModal"
+		:date="modalDate"
+		@close="handleModalClose"
+	></ModalEvento>
+	<ModalEventoEdit
+		:isOpen="showEditModal"
+		@close="handleModalClose"
+		:appointmentData="modalAppointment"
+	></ModalEventoEdit>
 </template>
 
 <script>
@@ -44,6 +42,7 @@ export default {
 			showEditModal: false,
 			calendarOptions: {
 				plugins: [dayGridPlugin, interactionPlugin],
+				dayHeaders: false,
 				dateClick: this.handleDateClick,
 				eventClick: this.handleEventClick,
 				initialView: "dayGridMonth",
@@ -91,6 +90,19 @@ export default {
 				)
 			}
 		},
+		async syncWithGoogle() {
+			try {
+				const response = await this.$api.syncGoogleCalendar()
+				if (response.url) {
+					window.location.href = response.url // Redirige a la autorización de Google
+				} else {
+					alert("Sincronización completada.")
+				}
+			} catch (err) {
+				console.error("Error al sincronizar:", err)
+				alert("Error al sincronizar con Google Calendar.")
+			}
+		},
 	},
 	async mounted() {
 		this.appointments = window.appointments
@@ -103,7 +115,6 @@ export default {
 button {
 	margin: 10px;
 	padding: 10px;
-	background-color: #42b983;
 	color: white;
 	cursor: pointer;
 }

@@ -5,8 +5,8 @@
 	<div id="app" v-else="!loading">
 		<header>
 			<nav>
-				<router-link to="/">Home</router-link>
-				<router-link to="/calendar">Calendar</router-link>
+				<router-link to="/">Inicio</router-link>
+				<router-link to="/calendar">Calendario</router-link>
 			</nav>
 			<button v-if="user && user.is_premium == 0" @click="buyPremium">
 				Comprar Premium
@@ -33,7 +33,7 @@
 
 			<div v-if="!user" class="header-account">
 				<div class="header-account-content">
-					<button @click="toLogin">Login</button>
+					<button @click="toLogin">Iniciar sesión</button>
 				</div>
 			</div>
 		</header>
@@ -48,13 +48,13 @@ import Modal from "./components/ModalConfig.vue"
 
 export default {
 	components: {
-		Modal,
+		Modal
 	},
 	data() {
 		return {
 			loading: true,
 			user: null,
-			modalOpen: false,
+			modalOpen: false
 		}
 	},
 	methods: {
@@ -73,7 +73,7 @@ export default {
 		async buyPremium() {
 			const response = await this.$api.buyPremium()
 			window.location.href = response.url
-		},
+		}
 	},
 	async mounted() {
 		const isAuthed = this.$session.token !== undefined
@@ -102,6 +102,6 @@ export default {
 		window.appointments = this.appointments
 
 		this.loading = false
-	},
+	}
 }
 </script>

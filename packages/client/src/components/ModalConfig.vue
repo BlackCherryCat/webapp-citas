@@ -104,6 +104,7 @@ export default {
 
 .form-buttons button {
 	width: 25%;
+	margin-bottom: 0;
 }
 
 .feedback {

@@ -11,7 +11,7 @@ return function (App $app) {
         $group->get("/self", function ($request, $response){
             $user = $request->getAttribute('user');
                 $response->getBody()->write(json_encode($user));
-                return $response->withHeader('Content-Type', 'application/json');
+                return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
         });
         $group->post('/self/avatar', function ($request, $response){
             $user = $request->getAttribute('user');
@@ -46,7 +46,7 @@ return function (App $app) {
 
                         if (!$user) {
                             $response->getBody()->write(json_encode(['error' => 'User not found']));
-                            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+                            return $response->withStatus(404)->withHeader('Content-Type', 'application/json');
                         }
 
                     $user->avatar = '/uploads/' . $filename;
@@ -56,7 +56,7 @@ return function (App $app) {
                         'success' => true,
                         'filename' => $filename
                     ]));
-                    return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+                    return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
         });
         $group->put('/self', function ($request, $response){
             $user = $request->getAttribute('user');
@@ -70,7 +70,7 @@ return function (App $app) {
 
 
 
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+            return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
         });
     })->add(new JWTAuth());
 };

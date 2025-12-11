@@ -1,0 +1,877 @@
+{
+	"openapi": "3.0.3",
+	"info": {
+		"title": "Webapp-Citas API",
+		"version": "1.0.0",
+		"description": "API del proyecto con Slim y JWT"
+	},
+	"paths": {
+		"/auth/register": {
+			"post": {
+				"summary": "Registrar un nuevo usuario",
+				"tags": ["Auth"],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"required": ["name", "email", "password"],
+								"properties": {
+									"name": {
+										"type": "string",
+										"example": "Juan"
+									},
+									"email": {
+										"type": "string",
+										"format": "email",
+										"example": "juan@example.com"
+									},
+									"password": {
+										"type": "string",
+										"format": "password",
+										"example": "secreto123"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Registro exitoso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"token": {
+											"type": "string",
+											"example": "eyJhbGciOiJIUzI1NiIsInR5cCI6..."
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Error interno (por ejemplo, email duplicado)",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"example": "Error al registrar usuario"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth": {
+			"post": {
+				"summary": "Iniciar sesi\u00f3n",
+				"tags": ["Auth"],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"required": ["email", "password"],
+								"properties": {
+									"email": {
+										"type": "string",
+										"format": "email",
+										"example": "juan@example.com"
+									},
+									"password": {
+										"type": "string",
+										"format": "password",
+										"example": "secreto123"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Inicio de sesi\u00f3n exitoso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"token": {
+											"type": "string",
+											"example": "eyJhbGciOiJIUzI1NiIsInR5cCI6..."
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Credenciales inv\u00e1lidas",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"example": "Credenciales inv\u00e1lidas"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/purchase/create-checkout-session": {
+			"post": {
+				"summary": "Crear una sesi\u00f3n de pago con Stripe",
+				"description": "Crea una sesi\u00f3n de Stripe Checkout para adquirir la membres\u00eda premium.",
+				"tags": ["Purchase"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Sesi\u00f3n de pago creada con \u00e9xito",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"url": {
+											"type": "string",
+											"format": "uri",
+											"example": "https://checkout.stripe.com/pay/cs_test_123456"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "No autorizado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"example": "Token inv\u00e1lido"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Error al crear la sesi\u00f3n de Stripe",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"example": "Error interno del servidor"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/purchase/payment-success": {
+			"get": {
+				"summary": "Confirmar el pago exitoso",
+				"description": "Marca la compra como completada y convierte al usuario en premium si el pago fue exitoso.",
+				"tags": ["Purchase"],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "session_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"description": "ID de sesi\u00f3n de Stripe"
+					},
+					{
+						"in": "query",
+						"name": "purchase_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"description": "ID de la compra en la base de datos"
+					},
+					{
+						"in": "query",
+						"name": "user_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"description": "ID del usuario autenticado"
+					}
+				],
+				"responses": {
+					"302": {
+						"description": "Redirecci\u00f3n al frontend tras \u00e9xito"
+					},
+					"400": {
+						"description": "Error en los par\u00e1metros de la URL"
+					}
+				}
+			}
+		},
+		"/purchase/payment-cancel": {
+			"get": {
+				"summary": "Cancelar el proceso de compra",
+				"description": "Marca la compra como fallida si el usuario cancela el proceso de pago.",
+				"tags": ["Purchase"],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "purchase_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"description": "ID de la compra que fue cancelada"
+					}
+				],
+				"responses": {
+					"302": {
+						"description": "Redirecci\u00f3n al frontend tras cancelaci\u00f3n"
+					}
+				}
+			}
+		},
+		"/users/self": {
+			"get": {
+				"summary": "Obtener los datos del usuario autenticado",
+				"tags": ["Users"],
+				"security": [{ "bearerAuth": [] }],
+				"responses": {
+					"200": {
+						"description": "Datos del usuario",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "integer",
+											"example": 1
+										},
+										"name": {
+											"type": "string",
+											"example": "Juan"
+										},
+										"email": {
+											"type": "string",
+											"format": "email",
+											"example": "juan@example.com"
+										},
+										"telegram_id": {
+											"type": "string",
+											"example": "123456789"
+										},
+										"avatar": {
+											"type": "string",
+											"example": "/uploads/avatar1"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Token faltante o inválido",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"example": "Missing token"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"summary": "Actualizar informaci\u00f3n del usuario autenticado",
+				"tags": ["Users"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"required": ["name", "email", "telegram_id"],
+								"properties": {
+									"name": {
+										"type": "string",
+										"example": "Nuevo Nombre"
+									},
+									"email": {
+										"type": "string",
+										"example": "nuevo@example.com"
+									},
+									"telegram_id": {
+										"type": "string",
+										"example": "99999"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Usuario actualizado correctamente"
+					},
+					"400": {
+						"description": "Datos inv\u00e1lidos"
+					},
+					"401": {
+						"description": "Token JWT no proporcionado o inv\u00e1lido"
+					}
+				}
+			}
+		},
+		"/users/self/avatar": {
+			"post": {
+				"summary": "Subir o actualizar avatar del usuario",
+				"tags": ["Users"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"multipart/form-data": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"file": {
+										"type": "string",
+										"format": "binary"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Avatar subido correctamente",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"example": true
+										},
+										"filename": {
+											"type": "string",
+											"example": "avatar1"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Error en la subida del archivo"
+					},
+					"401": {
+						"description": "Token JWT no proporcionado o inv\u00e1lido"
+					},
+					"404": {
+						"description": "Usuario no encontrado"
+					}
+				}
+			}
+		},
+		"/appointments": {
+			"post": {
+				"summary": "Crear una cita",
+				"tags": ["Appointments"],
+				"security": [{ "bearerAuth": [] }],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"required": [
+									"guest_user_name",
+									"title",
+									"description",
+									"date"
+								],
+								"properties": {
+									"guest_user_name": {
+										"type": "string",
+										"example": "Carlos"
+									},
+									"guest_user_telegram_id": {
+										"type": "string",
+										"example": "987654321"
+									},
+									"title": {
+										"type": "string",
+										"example": "Consulta médica"
+									},
+									"description": {
+										"type": "string",
+										"example": "Chequeo anual"
+									},
+									"date": {
+										"type": "string",
+										"format": "date-time",
+										"example": "2025-06-08T10:00:00"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Cita creada correctamente",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"example": true
+										},
+										"appointment": {
+											"$ref": "#/components/schemas/Appointment"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Token JWT faltante o inválido"
+					}
+				}
+			},
+			"get": {
+				"summary": "Obtener las citas del usuario",
+				"tags": ["Appointments"],
+				"security": [{ "bearerAuth": [] }],
+				"responses": {
+					"200": {
+						"description": "Lista de citas",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/Appointment"
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Token JWT faltante o inválido"
+					}
+				}
+			},
+			"put": {
+				"summary": "Actualizar una cita existente",
+				"tags": ["Appointments"],
+				"security": [{ "bearerAuth": [] }],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"required": [
+									"id",
+									"guest_user_name",
+									"title",
+									"description",
+									"date"
+								],
+								"properties": {
+									"id": {
+										"type": "integer",
+										"example": 1
+									},
+									"guest_user_name": {
+										"type": "string",
+										"example": "Carlos"
+									},
+									"title": {
+										"type": "string",
+										"example": "Revisión dental"
+									},
+									"description": {
+										"type": "string",
+										"example": "Control de ortodoncia"
+									},
+									"date": {
+										"type": "string",
+										"format": "date-time",
+										"example": "2025-06-09T16:00:00"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Cita actualizada correctamente",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"example": true
+										},
+										"appointment": {
+											"$ref": "#/components/schemas/Appointment"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Token JWT faltante o inválido"
+					}
+				}
+			},
+			"delete": {
+				"summary": "Eliminar una cita",
+				"tags": ["Appointments"],
+				"security": [{ "bearerAuth": [] }],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"required": ["id"],
+								"properties": {
+									"id": {
+										"type": "integer",
+										"example": 1
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Cita eliminada correctamente",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"example": true
+										}
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "No tienes permiso para eliminar esta cita o no existe.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"example": "No tienes permiso para eliminar esta cita o no existe."
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/calendar/google-auth": {
+			"get": {
+				"summary": "Obtener URL de autenticación de Google Calendar",
+				"description": "Genera y devuelve la URL para autorizar el acceso a Google Calendar. El JWT se guarda como estado para su recuperación posterior.",
+				"tags": ["Calendar"],
+				"security": [{ "bearerAuth": [] }],
+				"responses": {
+					"200": {
+						"description": "URL de autenticación generada correctamente",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"url": {
+											"type": "string",
+											"format": "uri",
+											"example": "https://accounts.google.com/o/oauth2/auth?..."
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Token JWT faltante o inválido",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"example": "Missing token"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/calendar/google-callback": {
+			"get": {
+				"summary": "Callback de Google para sincronizar citas",
+				"description": "Sincroniza las citas del usuario autenticado con su calendario de Google tras autorizar la aplicación.",
+				"tags": ["Calendar"],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "code",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"description": "Código de autorización proporcionado por Google"
+					},
+					{
+						"in": "query",
+						"name": "state",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"description": "Token JWT original enviado como estado"
+					}
+				],
+				"responses": {
+					"302": {
+						"description": "Redirección al frontend tras sincronizar correctamente"
+					},
+					"400": {
+						"description": "Falta el código de autorización",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"example": "Código no proporcionado"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Token inválido o usuario no encontrado"
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"Appointment": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"host_user_id": {
+						"type": "integer",
+						"example": 10
+					},
+					"guest_user_id": {
+						"type": "integer",
+						"nullable": true,
+						"example": 11
+					},
+					"guest_user_name": {
+						"type": "string",
+						"nullable": true,
+						"example": "Carlos"
+					},
+					"guest_user_telegram_id": {
+						"type": "string",
+						"nullable": true,
+						"example": "987654321"
+					},
+					"title": {
+						"type": "string",
+						"example": "Consulta médica"
+					},
+					"description": {
+						"type": "string",
+						"example": "Chequeo anual"
+					},
+					"date": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2025-06-09T10:00:00"
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updated_at": {
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
+			"User": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"name": {
+						"type": "string",
+						"example": "Juan"
+					},
+					"email": {
+						"type": "string",
+						"example": "Juan@dominio.com"
+					},
+					"pwd_hash": {
+						"type": "string",
+						"example": "eyJhbGciOiJIUzI1NiIsInR5cCI6..."
+					},
+					"avatar": {
+						"type": "string",
+						"format": "uri",
+						"nullable": true,
+						"example": "/uploads/avatar1"
+					},
+					"is_premium": {
+						"type": "boolean",
+						"example": true
+					},
+					"telegram_id": {
+						"type": "string",
+						"nullable": true,
+						"example": "9374128"
+					}
+				},
+				"description": "Representación pública de un usuario (los campos sensibles están ocultos)",
+				"required": ["id", "name", "is_premium"]
+			},
+			"Purchase": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"user_id": {
+						"type": "integer",
+						"description": "ID del usuario asociado a la compra",
+						"example": 42
+					},
+					"amount": {
+						"type": "number",
+						"format": "float",
+						"description": "Cantidad pagada",
+						"example": 6.0
+					},
+					"status": {
+						"type": "string",
+						"description": "Estado de la compra (pending, completed, failed, etc.)",
+						"example": "completed"
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2025-06-07T12:34:56Z"
+					},
+					"updated_at": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2025-06-07T12:40:00Z"
+					}
+				},
+				"required": ["user_id", "amount", "status"]
+			}
+		},
+		"securitySchemes": {
+			"bearerAuth": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			}
+		}
+	}
+}

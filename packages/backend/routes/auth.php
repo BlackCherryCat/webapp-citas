@@ -24,7 +24,7 @@ return function (App $app) {
         $jwt = JWT::encode($payload, $_ENV['JWT_SECRET'], 'HS256');
 
         $response->getBody()->write(json_encode(['token' => $jwt]));
-        return $response->withHeader('Content-Type', 'application/json');
+        return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
     });
 
     $app->post('/auth', function ($request, $response) {
@@ -47,6 +47,6 @@ return function (App $app) {
         ], $_ENV['JWT_SECRET'], 'HS256');
 
         $response->getBody()->write(json_encode(['token' => $token]));
-        return $response->withHeader('Content-Type', 'application/json');
+        return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
     });
 };

@@ -1,4 +1,9 @@
+#JWT_SECRET es por asi decirlo la clave del servidor, va a encriptar el token JWT en base a esa "passphrase". el TELEGRAM_BOT_TOKEN es la clave de la api de telegram para tu bot, el STRIPE_SECRET_KEY es la clave de la api de stripe para tu comercio, APP_URL es la url de la aplicacion (se podria cambiar a un dominio cuando la aplicacion sea publicada), GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET son las claves del proyecto de google cloud, y GOOGLE_REDIRECT_URI es donde se redirecciona despues de que el usuario haya autorizado la aplicacion después de haber hecho el login con google.
+
 JWT_SECRET=clave_super_secreta
 TELEGRAM_BOT_TOKEN=clave_super_secreta
 STRIPE_SECRET_KEY=clave_super_secreta
 APP_URL=la_url_en_donde_está_hosteado_este_servicio
+GOOGLE_CLIENT_ID=clave_super_secreta
+GOOGLE_CLIENT_SECRET=clave_super_secreta
+GOOGLE_REDIRECT_URI=la_url_en_donde_está_hosteado_este_servicio/calendar/google-callback

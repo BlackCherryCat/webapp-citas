@@ -20,5 +20,6 @@ $app->addBodyParsingMiddleware();
 (require __DIR__ . '/../routes/user.php')($app);
 (require __DIR__ . '/../routes/appointments.php')($app);
 (require __DIR__ . '/../routes/purchase.php')($app);
+(require __DIR__ . '/../routes/calendar.php')($app);
 
 $app->run();
