@@ -67,7 +67,7 @@ $group->get('/payment-success', function ($request, $response) {
         $userModel->is_premium = true;
         $userModel->save();
     }
-            header("Location: http://localhost:5173");
+            header("Location: https://proyectodaw.tplinkdns.com");
             exit;
 });
 
@@ -82,7 +82,7 @@ $group->get('/payment-cancel', function ($request, $response) {
         $purchase->save();
     }
 
-    header("Location: http://localhost:5173");
+    header("Location: https://proyectodaw.tplinkdns.com");
     exit;
 });
 

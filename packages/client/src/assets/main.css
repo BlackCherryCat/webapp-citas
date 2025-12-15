@@ -1,134 +1,245 @@
+/* Strong FullCalendar theme overrides + theme variables
+   This file provides high-specificity rules (with !important where needed)
+   to override FullCalendar's internal styles and ensure the calendar adapts
+   to light/dark themes used in the app.
+
+   Note: these rules are intentionally specific and use !important to defeat
+   FullCalendar's internal inline or library-provided CSS. Keep them together
+   and load this CSS after the FullCalendar CSS bundle.
+*/
+
+/* ------------------------------
+   Theme variables (light/dark)
+   ------------------------------ */
 @import "./base.css";
 
-#app {
-	display: flex;
-	flex-direction: column;
-	width: 100%;
+/* ------------------------------
+   Base page / container rules
+   ------------------------------ */
+html,
+body {
+	background: var(--color-background) !important;
+	color: var(--color-text) !important;
+	transition:
+		background var(--transition-fast) ease,
+		color var(--transition-fast) ease;
 }
 
-header {
-	display: flex;
-	flex-direction: row;
-
-	align-items: center;
-
-	width: 100%;
-
-	gap: 20px;
-	padding: 20px;
-
-	background-color: var(--color-background);
+/* Wrapper that usually contains the calendar */
+.view-container .calendar-wrapper,
+.view-container .fc,
+.calendar-card .fc,
+.calendar-wrapper .fc {
+	background: var(--card-bg) !important;
+	color: var(--color-text) !important;
+	border-radius: var(--fc-border-radius) !important;
+	box-shadow: var(--card-shadow) !important;
 }
 
-header nav {
-	display: flex;
-	flex-direction: row;
-
-	height: fit-content;
-	gap: 10px;
+/* ------------------------------
+   FullCalendar — global overrides
+   High specificity + !important to ensure overrides
+   ------------------------------ */
+/* Target common container classes that FullCalendar uses */
+.view-container .fc,
+.calendar-wrapper .fc,
+.fc,
+.fc * {
+	color: var(--color-text) !important;
+	background: transparent !important;
 }
 
-header nav a {
-	color: var(--color-text);
-	text-decoration: none;
-	cursor: pointer;
-
-	font-size: 1rem;
-	height: fit-content;
+/* Toolbar and title */
+.view-container .fc .fc-toolbar,
+.view-container .fc .fc-toolbar *,
+.calendar-wrapper .fc .fc-toolbar,
+.calendar-wrapper .fc .fc-toolbar *,
+.fc .fc-toolbar,
+.fc .fc-toolbar * {
+	color: var(--color-text) !important;
+	background: transparent !important;
 }
 
-main {
-	display: flex;
-	flex-direction: column;
-
-	width: 100%;
-
-	padding: 20px;
+/* Toolbar buttons — neutral appearance that adapts to theme */
+.view-container .fc .fc-button,
+.calendar-wrapper .fc .fc-button,
+.fc .fc-button {
+	background: transparent !important;
+	border: 1px solid rgba(0, 0, 0, 0.06) !important;
+	color: var(--color-text) !important;
+	padding: 6px 8px !important;
+	border-radius: 6px !important;
+	box-shadow: none !important;
 }
 
-.header-account {
-	position: relative;
-	margin-left: auto;
-
-	overflow: hidden;
-
-	background-color: var(--color-background-mute);
-	border-radius: 12px;
+/* Primary button variant used by FullCalendar */
+.view-container .fc .fc-button.fc-button-primary,
+.calendar-wrapper .fc .fc-button.fc-button-primary,
+.fc .fc-button.fc-button-primary {
+	background: var(--color-primary) !important;
+	color: var(--color-primary-contrast) !important;
+	border-color: transparent !important;
 }
 
-.header-account-content {
-	z-index: 15;
-	position: relative;
-
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	padding: 10px;
-	gap: 10px;
-}
-
-.header-account-bg-wrapper {
-	z-index: 10;
-
-	position: absolute;
-	top: 0;
-	left: 0;
-
-	width: 100%;
-	height: 100%;
-
-	background: linear-gradient(
-		90deg,
-		rgba(42, 123, 155, 1) 0%,
-		rgba(87, 199, 133, 1) 31%,
-		rgba(237, 221, 83, 1) 60%,
-		rgba(42, 123, 155, 1) 98%
-	);
-	background-size: 200% 100%;
-	animation: swipeBg 5s both infinite;
-	opacity: 0.5;
-}
-
-.header-account-avatar {
-	width: 34px;
-	height: 34px;
-	overflow: hidden;
-
-	border-radius: 8px;
-}
-
-@keyframes swipeBg {
-	0% {
-		background-position: 0% 0%;
-	}
-	50% {
-		background-position: 100% 0%;
-	}
-	100% {
-		background-position: 0% 0%;
-	}
-}
-
+/* Column headers and day numbers */
+.view-container .fc .fc-col-header-cell,
+.calendar-wrapper .fc .fc-col-header-cell,
+.fc .fc-col-header-cell,
+.view-container .fc .fc-daygrid-day-number,
+.calendar-wrapper .fc .fc-daygrid-day-number,
 .fc .fc-daygrid-day-number {
-	color: var(--color-text-mute);
+	color: var(--color-text-mute) !important;
 }
 
+/* Day cells */
+.view-container .fc .fc-daygrid-day,
+.calendar-wrapper .fc .fc-daygrid-day,
+.fc .fc-daygrid-day {
+	background: transparent !important;
+	color: var(--color-text) !important;
+}
+
+/* Ensure scrollers/sections inherit background */
+.view-container .fc .fc-scroller,
+.calendar-wrapper .fc .fc-scroller,
+.fc .fc-scroller {
+	background: transparent !important;
+}
+
+/* Grid / cell frames */
+.view-container .fc .fc-daygrid-day-frame,
+.calendar-wrapper .fc .fc-daygrid-day-frame,
+.fc .fc-daygrid-day-frame {
+	background: transparent !important;
+	border: none !important;
+}
+
+/* ------------------------------
+   Events styling (ensure readability in both themes)
+   ------------------------------ */
+/* Base event card */
+.view-container .fc .fc-daygrid-event,
+.calendar-wrapper .fc .fc-daygrid-event,
 .fc .fc-daygrid-event {
-	border: 1px solid var(--color-primary);
+	border: 1px solid var(--color-primary) !important;
+	background: var(--color-primary) !important;
+	color: var(--color-primary-contrast) !important;
+	border-radius: var(--fc-event-radius) !important;
+	padding: var(--fc-event-padding) !important;
+	box-shadow: none !important;
+	overflow: hidden !important;
+	text-overflow: ellipsis !important;
+	white-space: nowrap !important;
 }
 
+/* Event text */
+.view-container .fc .fc-daygrid-event .fc-event-title,
+.calendar-wrapper .fc .fc-daygrid-event .fc-event-title,
+.fc .fc-daygrid-event .fc-event-title {
+	color: var(--color-primary-contrast) !important;
+}
+
+/* Hover effect for events */
+.view-container .fc .fc-daygrid-event:hover,
+.calendar-wrapper .fc .fc-daygrid-event:hover,
 .fc .fc-daygrid-event:hover {
-	background-color: var(--color-primary-light);
-	cursor: pointer;
+	filter: brightness(0.95) !important;
+	cursor: pointer !important;
 }
 
-.fc .fc-daygrid-day:hover {
-	background-color: var(--vt-c-text-light-2);
-	cursor: pointer;
+/* Focused / selected events */
+.view-container .fc .fc-daygrid-event:focus,
+.calendar-wrapper .fc .fc-daygrid-event:focus,
+.fc .fc-daygrid-event:focus {
+	outline: 2px solid rgba(0, 0, 0, 0.06) !important;
+	outline-offset: 2px !important;
 }
 
-a {
-	color: var(--color-primary);
-	text-decoration: none;
+/* ------------------------------
+   Dark mode specific overrides (extra specificity)
+   ------------------------------ */
+html.dark .view-container .fc,
+html.dark .calendar-wrapper .fc,
+html.dark .fc {
+	background: var(--card-bg) !important;
+	color: var(--color-text) !important;
 }
+
+/* Dark event text — ensure contrast against primary background */
+html.dark .view-container .fc .fc-daygrid-event,
+html.dark .calendar-wrapper .fc .fc-daygrid-event,
+html.dark .fc .fc-daygrid-event {
+	background: var(--color-primary) !important;
+	/* Prefer a dark text if primary is light-ish in dark theme, else white */
+	color: var(--color-primary-contrast, #fff) !important;
+	border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Toolbar buttons in dark */
+html.dark .view-container .fc .fc-button,
+html.dark .calendar-wrapper .fc .fc-button,
+html.dark .fc .fc-button {
+	border-color: rgba(255, 255, 255, 0.06) !important;
+	color: var(--color-text) !important;
+}
+
+/* Column headers / numbers in dark */
+html.dark .view-container .fc .fc-col-header-cell,
+html.dark .calendar-wrapper .fc .fc-col-header-cell,
+html.dark .fc .fc-col-header-cell,
+html.dark .view-container .fc .fc-daygrid-day-number,
+html.dark .calendar-wrapper .fc .fc-daygrid-day-number,
+html.dark .fc .fc-daygrid-day-number {
+	color: var(--color-text-mute) !important;
+}
+
+/* ------------------------------
+   Extra high-specificity selectors to override inline styles where possible
+   (some FullCalendar code injects inline styles; !important on us usually wins)
+   ------------------------------ */
+.view-container .calendar-wrapper .fc .fc-daygrid-event,
+.calendar-card .calendar-wrapper .fc .fc-daygrid-event,
+html:not(.dark) .view-container .calendar-wrapper .fc .fc-daygrid-event {
+	border-radius: var(--fc-event-radius) !important;
+	padding: var(--fc-event-padding) !important;
+}
+
+/* If FullCalendar injects classes like .fc-theme-standard, make sure to target them */
+.fc-theme-standard .fc .fc-daygrid-event,
+.fc-theme-standard .fc-daygrid-event {
+	border-radius: var(--fc-event-radius) !important;
+	padding: var(--fc-event-padding) !important;
+	background: var(--color-primary) !important;
+	color: var(--color-primary-contrast) !important;
+}
+
+/* ------------------------------
+   Accessibility & focus helpers
+   ------------------------------ */
+.view-container .fc .fc-button:focus,
+.calendar-wrapper .fc .fc-button:focus,
+.fc .fc-button:focus {
+	box-shadow: 0 0 0 3px rgba(42, 123, 155, 0.12) !important;
+	outline: none !important;
+}
+
+/* Ensure text inside cells and events remains legible */
+.view-container .fc .fc-daygrid-day,
+.calendar-wrapper .fc .fc-daygrid-day,
+.fc .fc-daygrid-day {
+	color: var(--color-text) !important;
+}
+
+/* ------------------------------
+   Fallback: extremely specific selector to try to override inline style attributes
+   ------------------------------ */
+/* Target elements with style attributes set by the library and override common properties */
+.view-container [style] .fc-daygrid-event,
+.calendar-wrapper [style] .fc-daygrid-event,
+[style] .fc-daygrid-event {
+	background: var(--color-primary) !important;
+	color: var(--color-primary-contrast) !important;
+	border-color: var(--color-primary) !important;
+}
+
+/* End of FullCalendar overrides */

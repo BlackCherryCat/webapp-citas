@@ -1,70 +1,91 @@
 <template>
-	<h1>Bienvenido a la aplicación</h1>
-	<div v-if="appointments && appointments.length">
-		<h3>Tus citas:</h3>
-		<div
-			class="appointment-cont"
-			v-for="appointment in appointments"
-			:key="appointment.id"
-		>
+	<div class="view-container">
+		<h1>Bienvenido a la aplicación</h1>
+
+		<div v-if="appointments && appointments.length">
+			<h3>Tus citas:</h3>
+
+			<!-- Cada cita ahora tiene un contenedor tipo 'card' para diferenciarlas -->
 			<div
-				v-if="user.id !== appointment.host_user_id"
-				class="appointment"
+				class="appointment-card"
+				v-for="appointment in appointments"
+				:key="appointment.id"
 			>
-				<strong>{{ appointment.title }}</strong>
-				<div class="appointment-details">
-					<p>La cita de {{ appointment.host_user.name }}</p>
+				<!-- Contenido principal de la cita -->
+				<div class="appointment-main">
+					<div class="appointment-header">
+						<strong class="appointment-title">{{
+							appointment.title
+						}}</strong>
+						<span class="appointment-time">{{
+							formatDate(appointment.date)
+						}}</span>
+					</div>
 
-					<img :src="appointment.host_user.avatar" alt="Avatar" />
+					<div
+						v-if="user.id !== appointment.host_user_id"
+						class="appointment-body"
+					>
+						<img :src="appointment.host_user.avatar" alt="Avatar" />
+						<div class="appointment-meta">
+							<p class="muted">
+								La cita de {{ appointment.host_user.name }}
+							</p>
+							<p class="muted">
+								Descripción: {{ appointment.description }}
+							</p>
+						</div>
+					</div>
 
-					<p>
-						y usted con descripción
-						{{ appointment.description }}, es a las
-						{{ formatDate(appointment.date) }}
-					</p>
+					<div v-else class="appointment-body">
+						<img
+							v-if="appointment.guest_user"
+							:src="appointment.guest_user.avatar"
+							alt="Avatar"
+						/>
+						<div class="appointment-meta">
+							<p v-if="appointment.guest_user" class="muted">
+								Su cita con {{ appointment.guest_user.name }}
+							</p>
+							<p v-else class="muted">
+								Su cita con {{ appointment.guest_user_name }}
+							</p>
+							<p class="muted">
+								Descripción: {{ appointment.description }}
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Acciones -->
+				<div class="appointment-actions">
+					<button @click="editAppointment(appointment)">
+						Editar cita
+					</button>
+					<button
+						class="secondary"
+						@click="confirmDelete(appointment)"
+					>
+						Borrar cita
+					</button>
 				</div>
 			</div>
-			<div v-else>
-				<strong>{{ appointment.title }}</strong>
-				<div
-					class="appointment-details"
-					v-if="appointment.guest_user !== null"
-				>
-					<p>Su cita con {{ appointment.guest_user.name }}</p>
-					<img :src="appointment.guest_user.avatar" alt="Avatar" />
-					<p>
-						con descripción {{ appointment.description }}, es a las
-						{{ formatDate(appointment.date) }}
-					</p>
-				</div>
-				<p v-else>
-					Su cita con {{ appointment.guest_user_name }} sobre
-					{{ appointment.description }} es a las
-					{{ formatDate(appointment.date) }}
-				</p>
-			</div>
-			<div class="appointment-actions">
-				<button @click="editAppointment(appointment)">
-					Editar cita
-				</button>
-				<button class="secondary" @click="confirmDelete(appointment)">
-					Borrar cita
-				</button>
-			</div>
+
+			<ModalEventoEdit
+				:isOpen="showEditModal"
+				@close="handleModalClose"
+				:appointmentData="modalAppointment"
+			></ModalEventoEdit>
+			<ModalEventoDelete
+				:isOpen="showDeleteModal"
+				@close="showDeleteModal = false"
+				@delete="performDelete"
+				:appointment="appointmentToDelete"
+			/>
 		</div>
-		<ModalEventoEdit
-			:isOpen="showEditModal"
-			@close="handleModalClose"
-			:appointmentData="modalAppointment"
-		></ModalEventoEdit>
-		<ModalEventoDelete
-			:isOpen="showDeleteModal"
-			@close="showDeleteModal = false"
-			@delete="performDelete"
-			:appointment="appointmentToDelete"
-		/>
+
+		<h2 v-else>No tienes citas registradas</h2>
 	</div>
-	<h2 v-else>No tienes citas registradas</h2>
 </template>
 
 <script>
@@ -76,7 +97,7 @@ import { es } from "date-fns/locale"
 export default {
 	components: {
 		ModalEventoEdit,
-		ModalEventoDelete,
+		ModalEventoDelete
 	},
 	data() {
 		return {
@@ -85,14 +106,14 @@ export default {
 			showEditModal: false,
 			modalAppointment: null,
 			showDeleteModal: false,
-			appointmentToDelete: null,
+			appointmentToDelete: null
 		}
 	},
 	methods: {
 		formatDate(dateString) {
 			const date = new Date(dateString)
-			return format(date, "'a las' HH:mm 'el' dd 'de' MMMM 'de' yyyy", {
-				locale: es,
+			return format(date, "'A las' HH:mm 'el' dd 'de' MMMM 'de' yyyy", {
+				locale: es
 			})
 		},
 		editAppointment(appointment) {
@@ -113,10 +134,10 @@ export default {
 
 			if (result) {
 				window.appointments = window.appointments.filter(
-					(a) => a.id !== appointment.id,
+					(a) => a.id !== appointment.id
 				)
 				this.appointments = this.appointments.filter(
-					(a) => a.id !== appointment.id,
+					(a) => a.id !== appointment.id
 				)
 			}
 			this.showDeleteModal = false
@@ -124,44 +145,121 @@ export default {
 		handleModalClose() {
 			this.showEditModal = false
 			this.modalAppointment = null
-		},
+		}
 	},
 	async mounted() {
 		this.appointments = window.appointments.sort(
-			(a, b) => new Date(a.date) - new Date(b.date),
+			(a, b) => new Date(a.date) - new Date(b.date)
 		)
 		this.user = window.user
-	},
+	}
 }
 </script>
 
 <style scoped>
-.appointment-cont {
+/* Card style para cada elemento de la lista de citas */
+.appointment-card {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	width: 100%;
-	margin: 10px;
-	padding: 20px;
-	background-color: var(--color-background);
-	overflow: hidden;
+	margin: 12px 0;
+	padding: 16px;
+	background: var(--card-bg);
+	color: var(--color-text);
 	border-radius: 12px;
+	box-shadow: var(--card-shadow);
+	border: 1px solid rgba(0, 0, 0, 0.04);
+	gap: 12px;
 }
+
+.muted {
+	color: var(--color-text-mute);
+}
+
+.view-container h1,
+h3 {
+	color: var(--color-text);
+}
+
+/* Estructura interna */
+.appointment-main {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.appointment-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 8px;
+}
+
+.appointment-title {
+	font-weight: 600;
+	font-size: 1.05rem;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.appointment-time {
+	font-size: 0.95rem;
+	color: var(--color-text-mute);
+	white-space: nowrap;
+}
+
+/* Cuerpo con avatar y meta */
+.appointment-body {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.appointment-meta p {
+	margin: 0;
+}
+
+/* Acciones a la derecha */
 .appointment-actions {
 	display: flex;
 	gap: 10px;
-}
-.appointment-details {
-	display: flex;
-	align-items: center;
-	gap: 10px;
+	flex-shrink: 0;
 }
 
-img {
-	width: 30px;
-	height: 30px;
+/* Avatar */
+.appointment-card img {
+	width: 40px;
+	height: 40px;
 	border-radius: 50%;
 	object-fit: cover;
-	margin-bottom: 20px;
+}
+
+/* Responsive: en pantallas pequeñas las tarjetas se apilan */
+@media (max-width: 600px) {
+	.appointment-card {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+	.appointment-actions {
+		margin-top: 10px;
+		width: 100%;
+		justify-content: flex-end;
+	}
+}
+
+/* Mantener imágenes y estilos consistentes */
+img {
+	display: block;
+}
+
+/* Ajustes en modo oscuro (usa las variables definidas en main.css) */
+:root.dark .appointment-card {
+	background: var(--card-bg);
+	box-shadow: var(--card-shadow);
+	border-color: rgba(255, 255, 255, 0.04);
 }
 </style>

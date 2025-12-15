@@ -1,20 +1,29 @@
 <template>
-	<div class="login-container">
-		<h1>Iniciar sesión</h1>
+	<div class="login-page">
+		<div class="login-container">
+			<h1>Iniciar sesión</h1>
 
-		<form name="loginForm" @submit.prevent="login" class="login-form">
-			<label for="email">Email:</label>
-			<input type="email" id="email" v-model="email" required />
+			<form name="loginForm" @submit.prevent="login" class="login-form">
+				<label for="email">Email:</label>
+				<input type="email" id="email" v-model="email" required />
 
-			<label for="password">Contraseña:</label>
-			<input type="password" id="password" v-model="password" required />
+				<label for="password">Contraseña:</label>
+				<input
+					type="password"
+					id="password"
+					v-model="password"
+					required
+				/>
 
-			<button type="submit" :disabled="loading">Iniciar sesión</button>
-		</form>
+				<button type="submit" :disabled="loading">
+					Iniciar sesión
+				</button>
+			</form>
 
-		<div v-if="error" class="error-message">{{ error }}</div>
+			<div v-if="error" class="error-message">{{ error }}</div>
 
-		<router-link to="/register">Registrarse</router-link>
+			<router-link to="/register">Registrarse</router-link>
+		</div>
 	</div>
 </template>
 
@@ -56,48 +65,81 @@ export default {
 </script>
 
 <style scoped>
-a {
-	color: #007bff;
-	text-decoration: underline;
+.login-page h1 {
+	color: var(--color-text);
+}
+/* Contenedor full-viewport que centra su contenido */
+.login-page {
+	display: flex;
+	align-items: center; /* centra verticalmente */
+	justify-content: center; /* centra horizontalmente */
+	min-height: calc(
+		100vh - 200px
+	); /* deja espacio para header; ajusta si tu header tiene otra altura */
+	padding: 24px; /* evita que el contenido pegue en móviles */
+	box-sizing: border-box;
 }
 
+/* Contenedor del formulario: tamaño contenido, apariencia de tarjeta */
 .login-container {
 	display: flex;
 	flex-direction: column;
-
-	width: 400px;
+	gap: 16px;
+	width: 100%;
+	max-width: 420px; /* ancho máximo razonable para formularios */
+	background: var(--card-bg, #fff);
+	color: var(--color-text, #111);
+	padding: 20px;
+	border-radius: 12px;
+	box-shadow: var(--card-shadow, 0 6px 18px rgba(16, 24, 40, 0.06));
 }
 
+/* Formulario */
 .login-form {
 	display: flex;
 	flex-direction: column;
+	gap: 12px;
 }
 
-.login-form label {
-	margin-bottom: 0.5rem;
-}
-
+/* Inputs */
 .login-form input {
-	margin-bottom: 1rem;
-	padding: 0.5rem;
-	border: 1px solid #ccc;
-	border-radius: 4px;
+	padding: 10px 12px;
+	border-radius: 8px;
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	background: transparent;
+	color: inherit;
+	font-size: 1rem;
 }
 
+/* Botón */
 .login-form button {
-	padding: 0.5rem 1rem;
-	background-color: #007bff;
-	color: #fff;
+	padding: 10px 14px;
+	border-radius: 8px;
 	border: none;
-	border-radius: 4px;
+	background: var(--color-primary, #2a7b9b);
+	color: #fff;
 	cursor: pointer;
 }
 
+/* Enlaces y mensajes */
+a {
+	color: var(--color-primary, #2a7b9b);
+}
+
+/* Mensajes de error */
 .error-message {
 	background-color: #f8d7da;
 	color: #721c24;
 	padding: 0.5rem;
 	border-radius: 4px;
 	margin-top: 1rem;
+}
+
+/* Responsive: en pantallas pequeñas ocupamos casi todo el ancho */
+@media (max-width: 480px) {
+	.login-container {
+		padding: 16px;
+		max-width: 100%;
+	}
 }
 </style>

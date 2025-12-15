@@ -106,7 +106,7 @@ foreach ($appointments as $appointment) {
     $calendarService->events->insert('primary', $event);
 }
 
-    header("Location: http://localhost:5173/calendar");
+    header("Location: https://proyectodaw.tplinkdns.com/calendar");
     exit;
 });
 

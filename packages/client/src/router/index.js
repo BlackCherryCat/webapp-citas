@@ -8,29 +8,29 @@ const router = createRouter({
 		{
 			path: "/",
 			name: "home",
-			component: HomeView,
+			component: HomeView
 		},
 		{
 			path: "/login",
 			name: "login",
-			component: () => import("../views/Login.vue"),
+			component: () => import("../views/Login.vue")
 		},
 		{
 			path: "/register",
 			name: "register",
-			component: () => import("../views/Register.vue"),
+			component: () => import("../views/Register.vue")
 		},
 		{
 			path: "/logout",
 			name: "logout",
-			component: () => import("../views/Logout.vue"),
+			component: () => import("../views/Logout.vue")
 		},
 		{
 			path: "/calendar",
 			name: "calendar",
-			component: () => import("../views/Calendar.vue"),
-		},
-	],
+			component: () => import("../views/Calendar.vue")
+		}
+	]
 })
 
 // manejar cada vez que se cambia de ruta, para asegurarse de que el usuario esté autenticado

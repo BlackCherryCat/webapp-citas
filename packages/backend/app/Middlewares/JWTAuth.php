@@ -7,13 +7,14 @@ use Firebase\JWT\Key;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Slim\Psr7\Response;
 
 class JWTAuth
 {
     public function __invoke(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $authHeader = $request->getHeaderLine('Authorization');
-        $response = new \Slim\Psr7\Response();
+        $response = new Response();
 
         //verificar si viene el token en el header
         if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {

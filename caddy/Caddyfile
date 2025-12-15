@@ -1,0 +1,31 @@
+proyectodaw.tplinkdns.com {
+
+    route {
+
+        # API
+        handle_path /api/* {
+            reverse_proxy backend:80
+        }
+
+        # Archivos públicos del backend (avatars, swagger, etc)
+        handle /uploads/* {
+            reverse_proxy backend:80
+        }
+
+        handle /avatar {
+            reverse_proxy backend:80
+        }
+
+        handle /docs/* {
+            reverse_proxy backend:80
+        }
+
+        # Frontend SPA
+        handle {
+            root * /srv/frontend
+            try_files {path} /index.html
+            encode gzip
+            file_server
+        }
+    }
+}
