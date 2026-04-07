@@ -1,0 +1,51 @@
+services:
+    backend:
+        build:
+            context: ./packages/backend
+            dockerfile: Dockerfile
+        container_name: webapp_backend
+        restart: unless-stopped
+        volumes:
+            - ./packages/backend:/var/www/html:rw
+        environment:
+            DB_HOST: mariadb
+            DB_DATABASE: webapp_citas
+            DB_USERNAME: user
+            DB_PASSWORD: password
+        command: sh -c "if [ -d /var/www/html/public ]; then sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf; fi && sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf || true && a2enmod rewrite headers || true && apache2-foreground"
+        ports:
+            - "8098:80"
+        depends_on:
+            - mariadb
+        networks:
+            - web
+    frontend:
+        image: joseluisq/static-web-server:2
+        container_name: webapp_frontend
+        restart: unless-stopped
+        ports:
+            - "8099:80"
+        depends_on:
+            - backend
+        environment:
+            - SERVER_ROOT=/var/public
+        volumes:
+            - ./packages/client/dist:/var/public:ro
+        networks:
+            - web
+
+    mariadb:
+        image: mariadb:latest
+        container_name: mariadb
+        environment:
+            MARIADB_ROOT_PASSWORD: root_password
+            MARIADB_DATABASE: webapp_citas
+            MARIADB_USER: user
+            MARIADB_PASSWORD: password
+        volumes:
+            - ./db_data:/var/lib/mysql
+        networks:
+            - web
+
+networks:
+    web:
